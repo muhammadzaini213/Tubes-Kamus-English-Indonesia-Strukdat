@@ -171,23 +171,6 @@ dos2unix run.sh
 dos2unix runcompile.sh
 ```
 
----
-
-## 📁 Project Structure
-
-```
-kamusgimmick/
- ├─ src/
- │   ├─ main/java/com/kamus/gimmick/
- │   ├─ main/resources/
- ├─ pom.xml
- ├─ run.sh
- ├─ runcompile.sh
- └─ README.md
-```
-
----
-
 ## 🧪 Troubleshooting
 
 ### JavaFX modules not found:
@@ -207,46 +190,3 @@ chmod +x *.sh
 ```bash
 mvn -U clean install
 ```
-
-### “bad interpreter” error:
-
-```bash
-dos2unix run.sh
-```
-
----
-
-## 📝 Example run.sh
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [ -z "${JAVA_HOME:-}" ]; then
-  echo "JAVA_HOME not set — using system java"
-else
-  export PATH="$JAVA_HOME/bin:$PATH"
-fi
-
-echo "Running KamusGimmick..."
-mvn javafx:run
-```
-
-## 📝 Example runcompile.sh
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [ -z "${JAVA_HOME:-}" ]; then
-  echo "JAVA_HOME not set — using system java"
-else
-  export PATH="$JAVA_HOME/bin:$PATH"
-fi
-
-echo "Compiling..."
-mvn -q clean compile
-echo "Compile finished."
-```
-
----
