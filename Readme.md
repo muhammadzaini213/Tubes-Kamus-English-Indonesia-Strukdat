@@ -1,10 +1,3 @@
-Here is a clean, ready-to-use **README.md** for your project.
-
-You can copy-paste this directly into `README.md` in your repo:
-
----
-
-````markdown
 # 📘 KamusGimmick — JavaFX Desktop Application
 
 KamusGimmick is a cross-platform JavaFX desktop application built using **Java 21**, **OpenJFX 21**, and **Maven**.  
