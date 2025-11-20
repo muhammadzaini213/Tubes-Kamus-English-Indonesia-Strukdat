@@ -1,19 +1,5 @@
 # 📘 KamusGimmick — JavaFX Desktop Application
 
-KamusGimmick is a cross-platform JavaFX desktop application built using **Java 21**, **OpenJFX 21**, and **Maven**.  
-Supports **Linux** and **Windows** out of the box.
-
----
-
-## 🚀 Features
-- Modern **JavaFX 21** UI
-- Uses **Commons Lang3**
-- Linux run helper scripts
-- Fully cross-platform
-- Clean Maven setup
-
----
-
 ## 🛠 Requirements
 
 ### **Java 21**
