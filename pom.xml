@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>com.kamus.gimmick.MainApp</mainClass>
+        <mainClass>com.kamus.gimmick.Main</mainClass>
         <javafx.version>21.0.1</javafx.version>
     </properties>
 
