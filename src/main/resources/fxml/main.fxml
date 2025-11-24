@@ -23,7 +23,7 @@
                         </HBox>
                         <AnchorPane prefHeight="200.0" prefWidth="300.0">
                             <children>
-                                <TextArea prefHeight="200.0" prefWidth="300.0" />
+                                <TextArea fx:id="textAreaLeft" prefHeight="200.0" prefWidth="300.0" />
                             </children>
                         </AnchorPane>
                     </children>
@@ -37,7 +37,7 @@
                         </HBox>
                         <AnchorPane prefHeight="200.0" prefWidth="300.0">
                             <children>
-                                <TextArea prefHeight="200.0" prefWidth="300.0" />
+                                <TextArea fx:id="textAreaRight" prefHeight="200.0" prefWidth="300.0" />
                             </children>
                         </AnchorPane>
                     </children>
