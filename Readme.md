@@ -2,6 +2,8 @@
 
 
 ## 📁 Project Folder Structure — KamusGimmick
+
+```
 src/
 └── main/
     ├── java/com/kamus/gimmick/
@@ -28,6 +30,7 @@ src/
     │   └── dictionary/
     │       └── data.csv                     # Data kata-kata kamus (CSV)
 
+```
 
 ## 🛠 Requirements
 
