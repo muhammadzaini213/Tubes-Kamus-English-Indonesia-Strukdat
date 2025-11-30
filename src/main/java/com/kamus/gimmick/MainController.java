@@ -1,17 +1,27 @@
 package com.kamus.gimmick;
 
 import com.kamus.gimmick.dictionary.EnglishDictionary;
-import com.kamus.gimmick.layoutUtils.Language;
-import com.kamus.gimmick.layoutUtils.State;
+import com.kamus.gimmick.dictionary.IndonesianDictionary;
+import com.kamus.gimmick.easteregg.HelloGimmick;
+import com.kamus.gimmick.hashmap.GimmickHashMap;
+import com.kamus.gimmick.hashmap.GimmickInterface;
+import com.kamus.gimmick.hashmap.GimmickNode;
+import com.kamus.gimmick.utils.Language;
+import com.kamus.gimmick.utils.State;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
 
 public class MainController {
 
-    private State currentState; // State ini cek aja di State.java di folder Utils
+    private static final String dataDir = "src/main/resources/dataset/data.csv";
+
+    private State currentState;
     private boolean updating = false;
+    private GimmickHashMap gimmickMap = new GimmickHashMap();
 
     @FXML
     private TextArea textAreaLeft;
@@ -22,29 +32,53 @@ public class MainController {
     @FXML
     private ComboBox<Language> languageBoxRight;
 
-    private EnglishDictionary tree;
+    @FXML
+    private AnchorPane gimmickPane;
 
-    // ================= LOGIC =================
+    private EnglishDictionary englishDict;
+    private IndonesianDictionary indonesianDict;
+
+
+    // ================= TRANSLATION LOGIC =================
     private String translate(String text) {
         if (text == null || text.isEmpty())
             return "";
 
-        switch (currentState) {
-            case INDONESIA_ENGLISH:
-                return "[TRANSLASI ID → EN]: " + text;
-            case ENGLISH_INDONESIA:
-                return "[TRANSLASI EN → ID]: " + text;
-            default:
-                return text;
+        String[] words = text.split("\\s+");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            String translated;
+
+            if (currentState == State.INDONESIA_ENGLISH) {
+                translated = indonesianDict.find(word.toLowerCase());
+            } else {
+                translated = englishDict.find(word.toLowerCase());
+            }
+
+            if (translated == null)
+                translated = "[" + word + "]";
+            result.append(translated).append(" ");
         }
+        return result.toString().trim();
     }
 
     // ================= SETUP =================
     @FXML
     public void initialize() {
-        tree = new EnglishDictionary();
+        englishDict = new EnglishDictionary();
+        indonesianDict = new IndonesianDictionary();
+
+        if (!englishDict.loadAllData(dataDir, gimmickMap))
+            System.out.println("English dictionary loading failed");
+        if (!indonesianDict.loadAllData(dataDir, gimmickMap))
+            System.out.println("Indonesian dictionary loading failed");
+
         setupComboBox();
         setupTextAreas();
+
+        System.out.println("Dictionary Loaded: EN(" + englishDict.getSize() +
+                ") | ID(" + indonesianDict.getSize() + ")");
     }
 
     private void setupComboBox() {
@@ -55,37 +89,21 @@ public class MainController {
         languageBoxRight.getSelectionModel().select(Language.ENGLISH);
         currentState = State.INDONESIA_ENGLISH;
 
-        languageBoxLeft.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (updating || newVal == null)
-                return;
-            updating = true;
+        languageBoxLeft.valueProperty().addListener((obs, oldVal, newVal) -> updateLanguageSelection());
+        languageBoxRight.valueProperty().addListener((obs, oldVal, newVal) -> updateLanguageSelection());
+    }
 
-            if (newVal == Language.ENGLISH) {
-                languageBoxRight.getSelectionModel().select(Language.INDONESIA);
-            } else {
-                languageBoxRight.getSelectionModel().select(Language.ENGLISH);
-            }
-            swapTextAreas();
+    private void updateLanguageSelection() {
+        if (updating)
+            return;
+        updating = true;
 
-            updateCurrentState();
-            updating = false;
-        });
+        Language left = languageBoxLeft.getValue();
+        languageBoxRight.getSelectionModel().select(left == Language.ENGLISH ? Language.INDONESIA : Language.ENGLISH);
+        updateCurrentState();
+        swapTextAreas();
 
-        languageBoxRight.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (updating || newVal == null)
-                return;
-            updating = true;
-
-            if (newVal == Language.ENGLISH) {
-                languageBoxLeft.getSelectionModel().select(Language.INDONESIA);
-            } else {
-                languageBoxLeft.getSelectionModel().select(Language.ENGLISH);
-            }
-            swapTextAreas();
-
-            updateCurrentState();
-            updating = false;
-        });
+        updating = false;
     }
 
     private void setupTextAreas() {
@@ -95,8 +113,16 @@ public class MainController {
                 return;
             updating = true;
 
-            String result = translate(newText);
-            textAreaRight.setText(result);
+            textAreaRight.setText(translate(newText));
+
+            String key = newText.trim().toLowerCase();
+            GimmickInterface gimmick = gimmickMap.get(key, this);
+            if (gimmick != null) {
+                Node pane = gimmick.run();
+                showGimmick(pane); 
+            } else {
+                gimmickPane.getChildren().clear();
+            }
 
             updating = false;
         });
@@ -105,16 +131,7 @@ public class MainController {
     // ================= COMBOBOX SWITCHER =================
     private void updateCurrentState() {
         Language left = languageBoxLeft.getValue();
-        Language right = languageBoxRight.getValue();
-
-        if (left == Language.ENGLISH && right == Language.INDONESIA) {
-            currentState = State.ENGLISH_INDONESIA;
-        } else if (left == Language.INDONESIA && right == Language.ENGLISH) {
-            currentState = State.INDONESIA_ENGLISH;
-        } else {
-            currentState = null;
-        }
-
+        currentState = (left == Language.ENGLISH) ? State.ENGLISH_INDONESIA : State.INDONESIA_ENGLISH;
         System.out.println("Current state: " + currentState);
     }
 
@@ -144,6 +161,12 @@ public class MainController {
 
     public void setRightText(String text) {
         textAreaRight.setText(text);
+    }
+
+
+    // ================= GIMMICK =================
+    public void showGimmick(javafx.scene.Node node) {
+        gimmickPane.getChildren().setAll(node);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.kamus.gimmick.layoutUtils;
+package com.kamus.gimmick.utils;
 
 public enum Language {
     INDONESIA("Indonesia"),
