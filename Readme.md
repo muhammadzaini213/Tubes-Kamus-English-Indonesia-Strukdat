@@ -8,17 +8,20 @@ src/
 └── main/
     ├── java/com/kamus/gimmick/
     │   ├── dictionary/
-    │   │   ├── DictionaryInterface.java     # Interface umum untuk kamus
     │   │   ├── EnglishDictionary.java       # Kamus Inggris → Indonesia
     │   │   └── IndonesianDictionary.java    # Kamus Indonesia → Inggris
+    │   │
+    │   ├── easteregg/
+    │   │   └── HelloGimmick.java            # Gimmick / Easter egg
+    │   │
+    │   ├── hashmap/
+    │   │   ├── GimmickHashMap.java          # HashMap custom untuk gimmick
+    │   │   ├── GimmickInterface.java        # Interface gimmick
+    │   │   └── GimmickNode.java             # Node untuk HashMap chaining
     │   │
     │   ├── layoutUtils/
     │   │   ├── Language.java                # Enum bahasa untuk ComboBox
     │   │   └── State.java                   # Enum arah terjemahan aktif
-    │   │
-    │   ├── tree/
-    │   │   ├── Node.java                    # Node untuk Red-Black Tree
-    │   │   └── RedBlackTree.java            # Struktur data kamus
     │   │
     │   ├── Main.java                        # Entry point aplikasi JavaFX
     │   └── MainController.java              # Controller UI utama
@@ -27,7 +30,7 @@ src/
     │   ├── fxml/
     │   │   └── main-view.fxml               # Tampilan GUI utama
     │   │
-    │   └── dictionary/
+    │   └── dataset/
     │       └── data.csv                     # Data kata-kata kamus (CSV)
 
 ```
