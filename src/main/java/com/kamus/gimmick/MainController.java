@@ -2,10 +2,9 @@ package com.kamus.gimmick;
 
 import com.kamus.gimmick.dictionary.EnglishDictionary;
 import com.kamus.gimmick.dictionary.IndonesianDictionary;
-import com.kamus.gimmick.easteregg.HelloGimmick;
-import com.kamus.gimmick.hashmap.GimmickHashMap;
-import com.kamus.gimmick.hashmap.GimmickInterface;
-import com.kamus.gimmick.hashmap.GimmickNode;
+import com.kamus.gimmick.easteregg.GimmickInterface;
+import com.kamus.gimmick.tree.GimmickNode;
+import com.kamus.gimmick.tree.RedBlackTree;
 import com.kamus.gimmick.utils.Language;
 import com.kamus.gimmick.utils.State;
 
@@ -21,7 +20,7 @@ public class MainController {
 
     private State currentState;
     private boolean updating = false;
-    private GimmickHashMap gimmickMap = new GimmickHashMap();
+    private RedBlackTree gimmickTree = new RedBlackTree();
 
     @FXML
     private TextArea textAreaLeft;
@@ -37,7 +36,6 @@ public class MainController {
 
     private EnglishDictionary englishDict;
     private IndonesianDictionary indonesianDict;
-
 
     // ================= TRANSLATION LOGIC =================
     private String translate(String text) {
@@ -69,9 +67,9 @@ public class MainController {
         englishDict = new EnglishDictionary();
         indonesianDict = new IndonesianDictionary();
 
-        if (!englishDict.loadAllData(dataDir, gimmickMap))
+        if (!englishDict.loadAllData(dataDir))
             System.out.println("English dictionary loading failed");
-        if (!indonesianDict.loadAllData(dataDir, gimmickMap))
+        if (!indonesianDict.loadAllData(dataDir))
             System.out.println("Indonesian dictionary loading failed");
 
         setupComboBox();
@@ -116,12 +114,18 @@ public class MainController {
             textAreaRight.setText(translate(newText));
 
             String key = newText.trim().toLowerCase();
-            GimmickInterface gimmick = gimmickMap.get(key, this);
+            System.out.println("Input: " + newText);
+            System.out.println("Key: " + key);
+            GimmickInterface gimmick;
+            if (currentState == State.INDONESIA_ENGLISH) {
+                gimmick = indonesianDict.getGimmick(key, this);
+            } else {
+                gimmick = englishDict.getGimmick(key, this);
+            }
+            System.out.println("Gimmick: " + gimmick);
             if (gimmick != null) {
                 Node pane = gimmick.run();
-                showGimmick(pane); 
-            } else {
-                gimmickPane.getChildren().clear();
+                showGimmick(pane);
             }
 
             updating = false;
@@ -162,7 +166,6 @@ public class MainController {
     public void setRightText(String text) {
         textAreaRight.setText(text);
     }
-
 
     // ================= GIMMICK =================
     public void showGimmick(javafx.scene.Node node) {

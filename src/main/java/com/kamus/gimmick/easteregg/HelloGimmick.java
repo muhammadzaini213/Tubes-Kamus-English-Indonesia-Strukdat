@@ -9,8 +9,7 @@
 package com.kamus.gimmick.easteregg;
 
 import com.kamus.gimmick.MainController;
-import com.kamus.gimmick.hashmap.GimmickInterface;
-import com.kamus.gimmick.hashmap.GimmickNode;
+import com.kamus.gimmick.tree.GimmickNode;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;

@@ -1,4 +1,4 @@
-package com.kamus.gimmick.hashmap;
+package com.kamus.gimmick.easteregg;
 
 import javafx.scene.Node;
 
