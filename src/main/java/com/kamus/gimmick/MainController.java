@@ -114,22 +114,25 @@ public class MainController {
             textAreaRight.setText(translate(newText));
 
             String key = newText.trim().toLowerCase();
-            System.out.println("Input: " + newText);
-            System.out.println("Key: " + key);
+
             GimmickInterface gimmick;
             if (currentState == State.INDONESIA_ENGLISH) {
                 gimmick = indonesianDict.getGimmick(key, this);
             } else {
                 gimmick = englishDict.getGimmick(key, this);
             }
-            System.out.println("Gimmick: " + gimmick);
+
+
             if (gimmick != null) {
                 Node pane = gimmick.run();
                 showGimmick(pane);
+            } else {
+                gimmickPane.getChildren().clear();
             }
 
             updating = false;
         });
+
     }
 
     // ================= COMBOBOX SWITCHER =================

@@ -134,7 +134,6 @@ public class RedBlackTree {
                     GimmickNode.getParent().getParent().setRed(true);
                     GimmickNode = GimmickNode.getParent().getParent();
                 } else {
-                    // Uncle is black
                     if (GimmickNode == GimmickNode.getParent().getLeft()) {
                         GimmickNode = GimmickNode.getParent();
                         rotateRight(GimmickNode);
@@ -247,14 +246,11 @@ public class RedBlackTree {
             return;
         }
 
-        // Print current GimmickNode
-        String color = GimmickNode.isRed() ? "\u001B[31m" : "\u001B[37m"; // Red or White (black won't show in dark
-                                                                          // terminal)
+        String color = GimmickNode.isRed() ? "\u001B[31m" : "\u001B[37m"; 
         String reset = "\u001B[0m";
 
         System.out.println(prefix + (isTail ? "└── " : "├── ") + color + GimmickNode.getKey() + reset);
 
-        // Print children
         if (GimmickNode.getLeft() != null || GimmickNode.getRight() != null) {
             if (GimmickNode.getRight() != null) {
                 printTreeHelper(GimmickNode.getRight(), prefix + (isTail ? "    " : "│   "), false);
