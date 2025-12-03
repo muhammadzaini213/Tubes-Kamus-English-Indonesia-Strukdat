@@ -1,12 +1,13 @@
 package com.kamus.gimmick;
 
-import com.kamus.gimmick.dictionary.EnglishDictionary;
-import com.kamus.gimmick.dictionary.IndonesianDictionary;
+import java.io.IOException;
+
 import com.kamus.gimmick.easteregg.GimmickInterface;
 import com.kamus.gimmick.tree.GimmickNode;
 import com.kamus.gimmick.tree.RedBlackTree;
 import com.kamus.gimmick.utils.Language;
 import com.kamus.gimmick.utils.State;
+import com.opencsv.exceptions.CsvValidationException;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -34,8 +35,8 @@ public class MainController {
     @FXML
     private AnchorPane gimmickPane;
 
-    private EnglishDictionary englishDict;
-    private IndonesianDictionary indonesianDict;
+    private RedBlackTree englishDict;
+    private RedBlackTree indonesianDict;
 
     // ================= TRANSLATION LOGIC =================
     private String translate(String text) {
@@ -64,13 +65,19 @@ public class MainController {
     // ================= SETUP =================
     @FXML
     public void initialize() {
-        englishDict = new EnglishDictionary();
-        indonesianDict = new IndonesianDictionary();
+        englishDict = new RedBlackTree();
+        indonesianDict = new RedBlackTree();
 
-        if (!englishDict.loadAllData(dataDir))
-            System.out.println("English dictionary loading failed");
-        if (!indonesianDict.loadAllData(dataDir))
-            System.out.println("Indonesian dictionary loading failed");
+        try {
+            if (!englishDict.loadAllData(dataDir, "english", "indonesian")) {
+                System.out.println("English dictionary loading failed");
+            }
+            if (!indonesianDict.loadAllData(dataDir, "indonesian", "english")) {
+                System.out.println("Indonesian dictionary loading failed");
+            }
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
 
         setupComboBox();
         setupTextAreas();
@@ -121,7 +128,6 @@ public class MainController {
             } else {
                 gimmick = englishDict.getGimmick(key, this);
             }
-
 
             if (gimmick != null) {
                 Node pane = gimmick.run();

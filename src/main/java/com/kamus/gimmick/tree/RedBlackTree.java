@@ -1,8 +1,13 @@
 package com.kamus.gimmick.tree;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+
 import com.kamus.gimmick.MainController;
-import com.kamus.gimmick.dictionary.DictionaryInterface;
 import com.kamus.gimmick.easteregg.GimmickInterface;
+import com.opencsv.CSVReaderHeaderAware;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class RedBlackTree {
     private GimmickNode root;
@@ -46,17 +51,32 @@ public class RedBlackTree {
     }
 
     // ================ LOADER ================
-    public boolean loadAllData(String csvName) {
-        try {
-            if (this instanceof DictionaryInterface) {
-                int loadedCount = ((DictionaryInterface) this).loadFromCSV(csvName);
-                return loadedCount > 0;
+    public boolean loadAllData(String csvName, String keyCol, String valueCol)
+            throws IOException, CsvValidationException {
+        CSVReaderHeaderAware reader = new CSVReaderHeaderAware(new FileReader(csvName));
+        Map<String, String> values;
+        int count = 0;
+
+        while ((values = reader.readMap()) != null) {
+            String key = values.get(keyCol);
+            String value = values.get(valueCol);
+            String gimmick = values.get("gimmick");
+            if (gimmick == null) {
+                gimmick = "";
             }
-            return false;
-        } catch (Exception e) {
-            System.err.println("Error loading data from CSV: " + e.getMessage());
-            return false;
+
+            if (key != null && value != null) {
+                if (insert(key, value, gimmick)) {
+                    count++;
+                }
+            }
         }
+
+        reader.close();
+
+        if (count > 0)
+            return true;
+        return false;
     }
 
     protected boolean insert(String key, String value, String className) {
@@ -246,7 +266,7 @@ public class RedBlackTree {
             return;
         }
 
-        String color = GimmickNode.isRed() ? "\u001B[31m" : "\u001B[37m"; 
+        String color = GimmickNode.isRed() ? "\u001B[31m" : "\u001B[37m";
         String reset = "\u001B[0m";
 
         System.out.println(prefix + (isTail ? "└── " : "├── ") + color + GimmickNode.getKey() + reset);
