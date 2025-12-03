@@ -2,6 +2,7 @@ package com.kamus.gimmick.tree;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import com.kamus.gimmick.MainController;
@@ -51,7 +52,7 @@ public class RedBlackTree {
     }
 
     // ================ LOADER ================
-    public boolean loadAllData(String csvName, String keyCol, String valueCol)
+    public boolean loadAllData(String csvName, String keyCol, String valueCol, MainController mainController)
             throws IOException, CsvValidationException {
         CSVReaderHeaderAware reader = new CSVReaderHeaderAware(new FileReader(csvName));
         Map<String, String> values;
@@ -66,7 +67,7 @@ public class RedBlackTree {
             }
 
             if (key != null && value != null) {
-                if (insert(key, value, gimmick)) {
+                if (insert(key, value, gimmick, mainController)) {
                     count++;
                 }
             }
@@ -79,12 +80,28 @@ public class RedBlackTree {
         return false;
     }
 
-    protected boolean insert(String key, String value, String className) {
+    protected boolean insert(String key, String value, String className, MainController mainController) {
         if (key == null || value == null) {
             return false;
         }
 
-        GimmickNode newGimmickNode = new GimmickNode(key, value, className);
+        GimmickInterface gimmick = null;
+        if (!className.isEmpty()) {
+            try {
+                Class<?> cls = Class.forName(className);
+                gimmick = (GimmickInterface) cls.getConstructor(MainController.class)
+                        .newInstance(mainController);
+            } catch (ClassNotFoundException e) {
+                System.err.println("Class not found: " + className);
+            } catch (NoSuchMethodException e) {
+                System.err.println("Constructor not found in: " + className);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                System.err.println("Failed to instantiate: " + className);
+                e.printStackTrace();
+            }
+        }
+
+        GimmickNode newGimmickNode = new GimmickNode(key, value, gimmick);
 
         if (root == null) {
             root = newGimmickNode;
@@ -219,24 +236,23 @@ public class RedBlackTree {
     }
 
     // ================ GIMMICK ================
-    public GimmickInterface getGimmick(String key, MainController controller) {
+    public GimmickInterface getGimmick(String key, MainController mainController) {
         GimmickNode node = findNode(root, key);
-        if (node == null || node.getClassName() == null || node.getClassName().isBlank()) {
+        if (node == null || node.getClassName() == null || node.getClassName() == null) {
             return null;
         }
 
         try {
-            Class<?> cls = Class.forName(node.getClassName());
+            GimmickInterface gimmick = node.getClassName(); // langsung instance
 
-            if (controller != null) {
-                return (GimmickInterface) cls.getConstructor(MainController.class).newInstance(controller);
-            }
-
-            return (GimmickInterface) cls.getDeclaredConstructor().newInstance();
+            // jika sebelumnya ada mainController, abaikan saja
+            return gimmick;
         } catch (Exception e) {
-            System.err.println("Failed to load gimmick: " + node.getClassName());
+            System.err.println("Failed to load gimmick: " + node.getKey());
+            e.printStackTrace();
             return null;
         }
+
     }
 
     private GimmickNode findNode(GimmickNode current, String key) {

@@ -2,79 +2,112 @@ package com.kamus.gimmick.easteregg;
 
 import com.kamus.gimmick.MainController;
 import com.kamus.gimmick.utils.State;
+import com.kamus.gimmick.utils.Language;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class MiniDictionaryGimmick implements GimmickInterface {
 
-    private MainController controller;
 
-    public MiniDictionaryGimmick(MainController controller) {
-        this.controller = controller;
-    }
+private MainController controller;
 
-    @Override
-    public Node run() {
-        VBox container = new VBox(10);
-        container.setStyle("-fx-background-color: #f9f9f9; -fx-padding: 10px;");
+public MiniDictionaryGimmick(MainController controller) {
+    this.controller = controller;
+}
 
-        Label title = new Label("Mini Kamus (Gimmick)");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+@Override
+public Node run() {
+    VBox root = new VBox(10);
+    root.setPadding(new Insets(10));
 
-        TextField inputField = new TextField();
-        inputField.setPromptText("Masukkan kata...");
+    HBox topBox = new HBox(20);
 
-        Label resultLabel = new Label();
-        resultLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: green;");
+    VBox leftBox = new VBox(5);
+    ComboBox<Language> languageBoxLeft = new ComboBox<>();
+    languageBoxLeft.getItems().addAll(Language.values());
+    languageBoxLeft.getSelectionModel().select(Language.INDONESIA);
 
-        // =============== AREA GIMMICK ===============
-        StackPane gimmickArea = new StackPane();
-        gimmickArea.setPrefHeight(150);
-        gimmickArea.setStyle("-fx-background-color: #e0e0e0; -fx-padding: 5px; -fx-border-color: gray;");
+    TextArea textAreaLeft = new TextArea();
+    textAreaLeft.setWrapText(true);
+    textAreaLeft.setStyle("-fx-font-size: 16px;");
+    VBox.setVgrow(textAreaLeft, Priority.ALWAYS);
+    leftBox.getChildren().addAll(languageBoxLeft, textAreaLeft);
+    HBox.setHgrow(leftBox, Priority.ALWAYS);
 
-        Button translateButton = new Button("Cari");
-        translateButton.setOnAction(e -> {
-            String word = inputField.getText().trim().toLowerCase();
-            if (word.isEmpty()) {
-                resultLabel.setText("");
-                gimmickArea.getChildren().clear();
-                return;
-            }
+    VBox rightBox = new VBox(5);
+    ComboBox<Language> languageBoxRight = new ComboBox<>();
+    languageBoxRight.getItems().addAll(Language.values());
+    languageBoxRight.getSelectionModel().select(Language.ENGLISH);
 
-            // translate
-            String translation;
-            if (controller.getState() == State.INDONESIA_ENGLISH) {
-                translation = controller.getIndonesianDict().find(word);
-            } else {
-                translation = controller.getEnglishDict().find(word);
-            }
+    TextArea textAreaRight = new TextArea();
+    textAreaRight.setWrapText(true);
+    textAreaRight.setEditable(false);
+    textAreaRight.setStyle("-fx-font-size: 16px;");
+    VBox.setVgrow(textAreaRight, Priority.ALWAYS);
+    rightBox.getChildren().addAll(languageBoxRight, textAreaRight);
+    HBox.setHgrow(rightBox, Priority.ALWAYS);
 
-            if (translation == null) {
-                translation = "[Kata tidak ditemukan]";
-            }
+    topBox.getChildren().addAll(leftBox, rightBox);
+    VBox.setVgrow(topBox, Priority.ALWAYS);
 
-            resultLabel.setText(word + " = " + translation);
+    AnchorPane gimmickPane = new AnchorPane();
+    gimmickPane.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: gray; -fx-border-width: 1;");
+    VBox.setVgrow(gimmickPane, Priority.ALWAYS);
 
-            // tampilkan gimmick di area gimmick
-            if (word.equals("hello")) {
-                GimmickInterface gimmick = controller.getEnglishDict().getGimmick(word, controller);
-                if (gimmick != null) {
-                    Node gimmickNode = gimmick.run();
-                    gimmickArea.getChildren().setAll(gimmickNode);
-                }
-            } else {
-                gimmickArea.getChildren().clear();
-            }
-        });
+    root.getChildren().addAll(topBox, gimmickPane);
 
-        container.getChildren().addAll(title, inputField, translateButton, resultLabel, gimmickArea);
-        container.setPrefSize(400, 400);
+    textAreaLeft.textProperty().addListener((obs, oldText, newText) -> {
+        gimmickPane.getChildren().clear();
+        if (newText.isEmpty()) {
+            textAreaRight.clear();
+            return;
+        }
 
-        StackPane wrapper = new StackPane(container);
-        wrapper.setStyle("-fx-background-color: lightgray; -fx-padding: 10px;");
-        return wrapper;
-    }
+        String word = newText.trim().toLowerCase();
+        String translation;
+
+        if (controller.getState() == State.INDONESIA_ENGLISH) {
+            translation = controller.getIndonesianDict().find(word);
+        } else {
+            translation = controller.getEnglishDict().find(word);
+        }
+
+        if (translation == null) translation = "[Kata tidak ditemukan]";
+        textAreaRight.setText(translation);
+
+        GimmickInterface gimmick;
+        if (controller.getState() == State.INDONESIA_ENGLISH) {
+            gimmick = controller.getIndonesianDict().getGimmick(word, controller);
+        } else {
+            gimmick = controller.getEnglishDict().getGimmick(word, controller);
+        }
+
+        if (gimmick != null) {
+            Node gimmickNode = gimmick.run();
+            gimmickPane.getChildren().add(gimmickNode);
+            AnchorPane.setTopAnchor(gimmickNode, 0.0);
+            AnchorPane.setBottomAnchor(gimmickNode, 0.0);
+            AnchorPane.setLeftAnchor(gimmickNode, 0.0);
+            AnchorPane.setRightAnchor(gimmickNode, 0.0);
+        }
+    });
+
+    Stage gimmickStage = new Stage();
+    gimmickStage.initModality(Modality.APPLICATION_MODAL);
+    gimmickStage.setTitle("Mini Kamus Gimmick");
+    gimmickStage.setScene(new Scene(root, 1920, 1080));
+    gimmickStage.setFullScreenExitHint("");
+    gimmickStage.setFullScreen(true);
+    gimmickStage.show();
+
+    return new Pane();
+}
+
+
 }

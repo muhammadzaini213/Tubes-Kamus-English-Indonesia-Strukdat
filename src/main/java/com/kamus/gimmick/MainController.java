@@ -9,11 +9,13 @@ import com.kamus.gimmick.utils.Language;
 import com.kamus.gimmick.utils.State;
 import com.opencsv.exceptions.CsvValidationException;
 
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
 
 public class MainController {
 
@@ -69,10 +71,10 @@ public class MainController {
         indonesianDict = new RedBlackTree();
 
         try {
-            if (!englishDict.loadAllData(dataDir, "english", "indonesian")) {
+            if (!englishDict.loadAllData(dataDir, "english", "indonesian", this)) {
                 System.out.println("English dictionary loading failed");
             }
-            if (!indonesianDict.loadAllData(dataDir, "indonesian", "english")) {
+            if (!indonesianDict.loadAllData(dataDir, "indonesian", "english", this)) {
                 System.out.println("Indonesian dictionary loading failed");
             }
         } catch (IOException | CsvValidationException e) {
@@ -117,25 +119,27 @@ public class MainController {
             if (updating)
                 return;
             updating = true;
-
             textAreaRight.setText(translate(newText));
-
             String key = newText.trim().toLowerCase();
-
-            GimmickInterface gimmick;
-            if (currentState == State.INDONESIA_ENGLISH) {
-                gimmick = indonesianDict.getGimmick(key, this);
-            } else {
-                gimmick = englishDict.getGimmick(key, this);
-            }
-
-            if (gimmick != null) {
-                Node pane = gimmick.run();
-                showGimmick(pane);
-            } else {
-                gimmickPane.getChildren().clear();
-            }
-
+            PauseTransition delay = new PauseTransition(Duration.seconds(1));
+            delay.setOnFinished(event -> {
+                if (!key.equals(textAreaLeft.getText().trim().toLowerCase())) {
+                    return;
+                }
+                GimmickInterface gimmick;
+                if (currentState == State.INDONESIA_ENGLISH) {
+                    gimmick = indonesianDict.getGimmick(key, this);
+                } else {
+                    gimmick = englishDict.getGimmick(key, this);
+                }
+                if (gimmick != null) {
+                    Node pane = gimmick.run();
+                    showGimmick(pane);
+                } else {
+                    gimmickPane.getChildren().clear();
+                }
+            });
+            delay.play();
             updating = false;
         });
 

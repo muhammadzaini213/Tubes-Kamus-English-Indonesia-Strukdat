@@ -1,17 +1,19 @@
 package com.kamus.gimmick.tree;
 
+import com.kamus.gimmick.easteregg.GimmickInterface;
+
 public class GimmickNode {
 
     private String key;
     private String value;
-    private String className;
+    private GimmickInterface className;
     private GimmickNode left;
     private GimmickNode right;
     private GimmickNode parent;
 
     private boolean isRed = true;
     
-    public GimmickNode(String key, String value, String className) {
+    public GimmickNode(String key, String value, GimmickInterface className) {
         this.key = key.toLowerCase();
         this.value = value;
         this.className = className;
@@ -26,7 +28,7 @@ public class GimmickNode {
         return value;
     }
 
-    public String getClassName() {
+    public GimmickInterface getClassName() {
         return className;
     }
 

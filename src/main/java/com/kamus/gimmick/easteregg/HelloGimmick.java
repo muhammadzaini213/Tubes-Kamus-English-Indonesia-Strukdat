@@ -49,7 +49,7 @@ public class HelloGimmick implements GimmickInterface {
                 new BackgroundSize(100, 100, true, true, true, true)
         );
         pane.setBackground(new Background(background));
-        pane.setPrefSize(400, 200);
+        // pane.setPrefSize(400, 200);
 
         return pane;
     }
