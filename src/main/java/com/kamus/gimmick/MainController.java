@@ -181,4 +181,13 @@ public class MainController {
         gimmickPane.getChildren().setAll(node);
     }
 
+    // ================= GETTER DI MAINCONTROLLER =================
+    public RedBlackTree getEnglishDict() {
+        return englishDict;
+    }
+
+    public RedBlackTree getIndonesianDict() {
+        return indonesianDict;
+    }
+
 }
