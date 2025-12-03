@@ -9,26 +9,19 @@
 package com.kamus.gimmick.easteregg;
 
 import com.kamus.gimmick.MainController;
-import com.kamus.gimmick.tree.GimmickNode;
-
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.*;
 
 import java.util.Objects;
 
 // ================= WAJIB ADA CONSTRUCTOR DAN INTERFACE =================
-public class HelloGimmick implements GimmickInterface {
+public class BodohGimmick implements GimmickInterface {
 
     private MainController controller;
 
-    public HelloGimmick(MainController controller) {
+    public BodohGimmick(MainController controller) {
         this.controller = controller;
     }
 
@@ -36,11 +29,11 @@ public class HelloGimmick implements GimmickInterface {
     // ================= TAMPILAN GIMMICK =================
     @Override
     public Node run() {
-        Label label = new Label("Hello Gimmick!");
+        Label label = new Label(null);
         label.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
 
         StackPane pane = new StackPane(label);
-        Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/abu.jpg")));
+        Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/bodoh.png")));
         BackgroundImage background = new BackgroundImage(
                 backgroundImage,
                 BackgroundRepeat.NO_REPEAT,
